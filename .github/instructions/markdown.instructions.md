@@ -16,7 +16,7 @@ Follow these guidelines to ensure documentation quality across the repository.
 - Use LF line endings (enforced by `.gitattributes`)
 - Include meaningful alt text for all images
 - Validate with `markdownlint` before committing
-- Refer to `docs/guides/markdown-style-guide.md` for quick rules and examples
+- These standards serve as the canonical style reference for all markdown in this repository
 
 ## Line Length Guidelines
 
@@ -124,7 +124,7 @@ When generating core workflow artifacts, agents **MUST** follow the canonical te
 
 **MANDATORY**: All agent-generated documentation MUST follow the styling standards defined in:
 
-📚 **[documentation-styling.md](../agents/_shared/documentation-styling.md)**
+📚 **[Azure Artifacts Skill](../skills/azure-artifacts/SKILL.md)**
 
 ### Quick Reference
 

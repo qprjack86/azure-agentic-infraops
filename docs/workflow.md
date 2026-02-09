@@ -1,6 +1,6 @@
 # Agent and Skill Workflow
 
-> Version 8.1.0 | The 7-step infrastructure development workflow
+> [Current Version](../VERSION.md) | The 7-step infrastructure development workflow
 
 ## Overview
 
@@ -51,7 +51,7 @@ graph TB
     end
 
     subgraph "Step 7: Documentation"
-        DOCS["azure-workload-docs<br/>📚 Skill"]
+        DOCS["azure-artifacts<br/>📚 Skill"]
     end
 
     COND -->|"delegates"| REQ
@@ -88,7 +88,7 @@ graph TB
 
 | Agent | Persona | Role | Model |
 |-------|---------|------|-------|
-| **InfraOps Conductor** | 🎼 Maestro | Master orchestrator for 7-step workflow | Claude Sonnet 4.5 |
+| **InfraOps Conductor** | 🎼 Maestro | Master orchestrator for 7-step workflow | Claude Opus 4.6 |
 
 ### Core Agents (7 Steps)
 
@@ -124,9 +124,11 @@ The Conductor enforces mandatory pause points for human oversight:
 
 | Gate | After Step | User Action |
 |------|------------|-------------|
-| **Gate 1** | Planning (Step 4) | Approve implementation plan |
-| **Gate 2** | Pre-Deploy (Step 5) | Approve lint/what-if/review results |
-| **Gate 3** | Post-Deploy (Step 6) | Verify deployed resources |
+| **Gate 1** | Requirements (Step 1) | Confirm requirements complete |
+| **Gate 2** | Architecture (Step 2) | Approve WAF assessment |
+| **Gate 3** | Planning (Step 4) | Approve implementation plan |
+| **Gate 4** | Pre-Deploy (Step 5) | Approve lint/what-if/review results |
+| **Gate 5** | Post-Deploy (Step 6) | Verify deployment |
 
 ---
 
@@ -271,7 +273,7 @@ Output: agent-output/{project}/06-deployment-summary.md
 
 ### Step 7: Documentation (📚 Skills)
 
-**Skill**: `azure-workload-docs`
+**Skill**: `azure-artifacts`
 
 Generate comprehensive workload documentation.
 
@@ -336,7 +338,7 @@ Output: agent-output/{project}/07-*.md
 **Explicit**: Reference the skill by name:
 
 ```text
-"Use the azure-workload-docs skill to generate documentation"
+"Use the azure-artifacts skill to generate documentation"
 ```
 
 ---
