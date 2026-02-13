@@ -1,9 +1,6 @@
 ---
 name: bicep-whatif-subagent
-description: >
-  Bicep deployment preview subagent. Runs az deployment group what-if to preview changes
-  before deployment. Analyzes policy violations, resource changes, and cost impact.
-  Returns structured summary for parent agent review.
+description: Bicep deployment preview subagent. Runs az deployment group what-if to preview changes before deployment. Analyzes policy violations, resource changes, and cost impact. Returns structured summary for parent agent review.
 model: "Claude Haiku 4.5 (copilot)"
 user-invokable: false
 disable-model-invocation: false
