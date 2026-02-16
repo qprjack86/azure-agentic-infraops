@@ -4,15 +4,15 @@
 
 ## Agent Personas Quick Reference
 
-| Agent | Persona | Common Issues |
-|-------|---------|---------------|
-| InfraOps Conductor | 🎼 Maestro | Subagent invocation not working |
-| requirements | 📜 Scribe | Not appearing in list |
-| architect | 🏛️ Oracle | MCP pricing not connecting |
-| bicep-plan | 📐 Strategist | Governance discovery failing |
-| bicep-code | ⚒️ Forge | Validation subagents not running |
-| deploy | 🚀 Envoy | Azure auth issues |
-| diagnose | 🔍 Sentinel | — |
+| Agent              | Persona       | Common Issues                    |
+| ------------------ | ------------- | -------------------------------- |
+| InfraOps Conductor | 🎼 Maestro    | Subagent invocation not working  |
+| requirements       | 📜 Scribe     | Not appearing in list            |
+| architect          | 🏛️ Oracle     | MCP pricing not connecting       |
+| bicep-plan         | 📐 Strategist | Governance discovery failing     |
+| bicep-code         | ⚒️ Forge      | Validation subagents not running |
+| deploy             | 🚀 Envoy      | Azure auth issues                |
+| diagnose           | 🔍 Sentinel   | —                                |
 
 ## Quick Decision Tree
 
@@ -153,11 +153,11 @@ cat .github/skills/azure-diagrams/SKILL.md | head -30
 
 **Common policies**:
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| "Azure AD only" | SQL Server needs AAD auth | Set `azureADOnlyAuthentication: true` |
-| "Zone redundancy" | Wrong SKU tier | Use P1v4+ for App Service |
-| "Missing tags" | Required tags absent | Add Environment, ManagedBy, Project, Owner |
+| Error             | Cause                     | Solution                                   |
+| ----------------- | ------------------------- | ------------------------------------------ |
+| "Azure AD only"   | SQL Server needs AAD auth | Set `azureADOnlyAuthentication: true`      |
+| "Zone redundancy" | Wrong SKU tier            | Use P1v4+ for App Service                  |
+| "Missing tags"    | Required tags absent      | Add Environment, ManagedBy, Project, Owner |
 
 **Run preflight check**:
 
@@ -284,17 +284,51 @@ docker ps
 
 ---
 
-### 9. Git Push Fails with Lefthook Errors
+### 9. Orphaned VS Code Extensions Injecting Unwanted Instructions
+
+**Symptom**: Copilot loads instruction files from extensions that are not listed in `devcontainer.json`
+(e.g., `ms-azuretools.vscode-azure-github-copilot`). You may see unexpected rules or context being
+injected into agent conversations.
+
+**Cause**: Extension directories can persist in `~/.vscode-server/extensions/` even after an extension
+is removed from the `devcontainer.json` extensions list. VS Code auto-loads instruction files from any
+extension on disk, regardless of whether it is actively managed.
+
+**Solution**:
+
+1. List orphaned extensions:
+
+   ```bash
+   # Compare installed extensions against devcontainer.json
+   ls ~/.vscode-server/extensions/ | sort > /tmp/installed.txt
+   # Look for anything not in your devcontainer.json extensions list
+   ```
+
+2. Remove the orphaned extension directory:
+
+   ```bash
+   rm -rf ~/.vscode-server/extensions/<orphaned-extension-folder>
+   ```
+
+3. Reload the VS Code window (`Ctrl+Shift+P` → "Developer: Reload Window").
+
+> **Note**: Orphaned extensions may reappear after a dev container rebuild from a cached Docker layer.
+> If this happens, rebuild without cache:
+> `Ctrl+Shift+P` → "Dev Containers: Rebuild Container Without Cache".
+
+---
+
+### 10. Git Push Fails with Lefthook Errors
 
 **Symptom**: Pre-commit hooks fail.
 
 **Common hooks**:
 
-| Hook | Command | Fix |
-|------|---------|-----|
-| Artifact validation | `npm run validate` | Fix H2 structure |
-| Markdown lint | `npm run lint:md` | Fix markdown issues |
-| Commitlint | `commitlint` | Use conventional commit format |
+| Hook                | Command            | Fix                            |
+| ------------------- | ------------------ | ------------------------------ |
+| Artifact validation | `npm run validate` | Fix H2 structure               |
+| Markdown lint       | `npm run lint:md`  | Fix markdown issues            |
+| Commitlint          | `commitlint`       | Use conventional commit format |
 
 **Skip hooks temporarily** (not recommended):
 
@@ -304,7 +338,7 @@ git commit --no-verify -m "fix: temporary"
 
 ---
 
-### 10. Handoff Prompt Not Working
+### 11. Handoff Prompt Not Working
 
 **Symptom**: Agent handoff button does nothing.
 

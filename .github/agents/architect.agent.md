@@ -184,6 +184,8 @@ These skills are your single source of truth. Do NOT use hardcoded values.
 - ❌ Provide generic recommendations — be specific to the workload
 - ❌ Assume requirements — ask when critical info is missing
 - ❌ Use wrong Pricing MCP service names (e.g., "Azure SQL" instead of "SQL Database")
+- ❌ **Hardcode prices** — NEVER write dollar amounts from memory. ALL prices in `02-architecture-assessment.md` and `03-des-cost-estimate.md` MUST originate from `cost-estimate-subagent` responses
+- ❌ **Guess SKU hourly rates** — pricing tiers change frequently; only subagent-verified figures are trustworthy
 
 ## Prerequisites Check
 
@@ -204,31 +206,53 @@ Verify these are documented (ask user if missing):
 1. **Read requirements** — Parse `01-requirements.md` for scope, NFRs, compliance
 2. **Search docs** — Query Microsoft docs for each Azure service and architecture pattern
 3. **Assess trade-offs** — Evaluate all 5 WAF pillars, identify primary optimization
-4. **Estimate costs** — Use Azure Pricing MCP for real-time SKU pricing
-5. **Generate assessment** — Save `02-architecture-assessment.md` following template H2s
-6. **Generate cost estimate** — Save `03-des-cost-estimate.md` following template H2s
-7. **Self-validate** — Run `npm run lint:artifact-templates` and fix any errors for your artifacts
-8. **Approval gate** — Present summary, wait for user approval before handoff
+4. **Select SKUs** — Choose resource SKUs and tiers (NO prices yet — leave cost columns blank)
+5. **Delegate pricing** — Send resource list to `cost-estimate-subagent`; receive verified prices
+6. **Generate assessment** — Save `02-architecture-assessment.md` with subagent-sourced prices
+7. **Generate cost estimate** — Save `03-des-cost-estimate.md` with subagent-sourced prices
+8. **Self-validate** — Run `npm run lint:artifact-templates` and fix any errors for your artifacts
+9. **Pricing sanity check** — Verify no dollar figures in your artifacts were written from memory (grep for `$` and confirm each matches subagent output)
+10. **Approval gate** — Present summary, wait for user approval before handoff
 
 ## Cost Estimation (MANDATORY)
 
-Delegate pricing work to `cost-estimate-subagent` to keep your context focused on WAF analysis:
+> [!CAUTION]
+> **Pricing Accuracy Gate**: Model evaluation found that the Architect agent
+> hallucinated SKU prices (e.g., AKS Standard at $0.60/hr instead of $0.10/hr)
+> when writing prices from parametric knowledge. ALL dollar figures MUST come from
+> the `cost-estimate-subagent` (Codex-powered, MCP-verified). Never write a price
+> that did not originate from a subagent response.
+
+Delegate ALL pricing work to `cost-estimate-subagent` to keep your context focused on WAF analysis:
 
 1. **Prepare resource list** — compile resource types, SKUs, region, and quantities from your assessment
 2. **Delegate to `cost-estimate-subagent`** — provide the resource list and region
-3. **Receive cost breakdown** — structured table with monthly/yearly totals
-4. **Integrate into assessment** — use the subagent's output to populate `03-des-cost-estimate.md`
+3. **Receive cost breakdown** — structured table with monthly/yearly totals and per-resource rates
+4. **Integrate verbatim** — copy the subagent's prices into both `02-architecture-assessment.md` (Cost Assessment table) and `03-des-cost-estimate.md` line items. Do NOT round, adjust, or "correct" subagent figures
+5. **Cross-check totals** — verify that the sum of line items equals the reported total. Flag any discrepancy to the user before proceeding
+
+### What Goes Where
+
+| Artifact                                                       | Pricing Content                      | Source                   |
+| -------------------------------------------------------------- | ------------------------------------ | ------------------------ |
+| `02-architecture-assessment.md` → Cost Assessment table        | Service / SKU / Monthly Cost         | Subagent response        |
+| `02-architecture-assessment.md` → Resource SKU Recommendations | Monthly Est. column                  | Subagent response        |
+| `03-des-cost-estimate.md` → all sections                       | Every dollar figure                  | Subagent response        |
+| WAF pillar prose (Strengths/Gaps)                              | Qualitative only — NO dollar figures | Architect's own analysis |
 
 The subagent uses these Azure Pricing MCP tools on your behalf:
 
-| Tool                     | Purpose                                              |
-| ------------------------ | ---------------------------------------------------- |
-| `azure_price_search`     | Query current retail prices with filters             |
-| `azure_price_compare`    | Compare across regions or SKUs                       |
-| `azure_cost_estimate`    | Calculate monthly/yearly costs for a single resource |
-| `azure_bulk_estimate`    | Estimate costs for multiple resources in one call    |
-| `azure_region_recommend` | Find cheapest region for a SKU                       |
-| `azure_discover_skus`    | List available SKUs for a service                    |
+| Tool                     | Purpose                                             | Preferred |
+| ------------------------ | --------------------------------------------------- | --------- |
+| `azure_bulk_estimate`    | All resources in one call (**use this by default**) | ✅ Yes    |
+| `azure_region_recommend` | Find cheapest region for compute SKUs               | Optional  |
+| `azure_price_search`     | RI/SP pricing lookup only (not for base prices)     | Optional  |
+| `azure_cost_estimate`    | Fallback for single resource if bulk fails          | Avoid     |
+| `azure_discover_skus`    | Only if SKU name is unknown                         | Avoid     |
+
+> [!TIP]
+> The subagent targets ≤ 5 MCP calls total. When providing the resource list,
+> include service_name, SKU, region, and quantity so it can use `azure_bulk_estimate` in one call.
 
 Refer to azure-defaults skill for exact `service_name` values.
 Fallback: [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/)
@@ -267,6 +291,8 @@ Include attribution header from the template file (do not hardcode).
 - [ ] All 5 WAF pillars scored with rationale and confidence level
 - [ ] Service Maturity Assessment table included
 - [ ] Cost estimate generated with real Pricing MCP data
+- [ ] **Every dollar figure** in 02 and 03 artifacts traces back to `cost-estimate-subagent` response — no hardcoded prices
+- [ ] Line-item totals sum correctly to reported monthly total
 - [ ] H2 headings match azure-artifacts templates exactly
 - [ ] Region selection justified (default: swedencentral)
 - [ ] AVM modules recommended where available

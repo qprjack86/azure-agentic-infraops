@@ -71,12 +71,6 @@ tools:
     azure-mcp/storage,
     azure-mcp/subscription_list,
     azure-mcp/workbooks,
-    azure-pricing/azure_bulk_estimate,
-    azure-pricing/azure_cost_estimate,
-    azure-pricing/azure_price_search,
-    azure-pricing/azure_price_compare,
-    azure-pricing/azure_region_recommend,
-    azure-pricing/azure_discover_skus,
     bicep/get_az_resource_type_schema,
     bicep/get_bicep_best_practices,
     bicep/list_avm_metadata,
@@ -95,7 +89,7 @@ handoffs:
     send: true
   - label: ▶ Generate Cost Estimate Only
     agent: As-Built
-    prompt: Generate only the as-built cost estimate (07-ab-cost-estimate.md) using Azure Pricing MCP tools for the deployed resources.
+    prompt: Generate only the as-built cost estimate (07-ab-cost-estimate.md). Query deployed resources for actual SKUs, then delegate pricing to cost-estimate-subagent. Use subagent-returned prices verbatim.
     send: true
   - label: Return to Conductor
     agent: InfraOps Conductor
@@ -129,7 +123,7 @@ handoffs:
 
 - ✅ Read ALL prior artifacts (01-06) before generating any documentation
 - ✅ Query deployed Azure resources for real state (not just planned state)
-- ✅ Use Azure Pricing MCP for as-built cost estimates with actual deployed SKUs
+- ✅ Delegate pricing to `cost-estimate-subagent` for as-built cost estimates
 - ✅ Generate the as-built architecture diagram using azure-diagrams skill
 - ✅ Match H2 headings from azure-artifacts templates exactly
 - ✅ Include attribution headers from template files
@@ -144,6 +138,8 @@ handoffs:
 - ❌ Use planned values when actual deployed values are available
 - ❌ Generate documentation for resources that failed deployment
 - ❌ Use H2 headings that differ from the templates
+- ❌ **Hardcode prices** — NEVER write dollar amounts from memory. ALL prices in `07-ab-cost-estimate.md` MUST originate from `cost-estimate-subagent` responses
+- ❌ **Call Azure Pricing MCP tools directly** — delegate all pricing to `cost-estimate-subagent`
 
 ## Prerequisites Check
 
@@ -174,15 +170,30 @@ If `06-deployment-summary.md` is missing, STOP — deployment has not completed.
 
 Generate these files IN ORDER (each builds on the previous):
 
-| Order | File                        | Content                                       |
-| ----- | --------------------------- | --------------------------------------------- |
-| 1     | `07-resource-inventory.md`  | All deployed resources with IDs and config    |
-| 2     | `07-design-document.md`     | Architecture decisions and rationale          |
-| 3     | `07-ab-cost-estimate.md`    | As-built costs using Pricing MCP              |
-| 4     | `07-compliance-matrix.md`   | Security and compliance controls mapping      |
-| 5     | `07-backup-dr-plan.md`      | Backup, DR, and business continuity           |
-| 6     | `07-operations-runbook.md`  | Day-2 operations, monitoring, troubleshooting |
-| 7     | `07-documentation-index.md` | Index of all project artifacts with links     |
+| Order | File                        | Content                                                     |
+| ----- | --------------------------- | ----------------------------------------------------------- |
+| 1     | `07-resource-inventory.md`  | All deployed resources with IDs and config                  |
+| 2     | `07-design-document.md`     | Architecture decisions and rationale                        |
+| 3     | `07-ab-cost-estimate.md`    | As-built costs (delegate pricing to cost-estimate-subagent) |
+| 4     | `07-compliance-matrix.md`   | Security and compliance controls mapping                    |
+| 5     | `07-backup-dr-plan.md`      | Backup, DR, and business continuity                         |
+| 6     | `07-operations-runbook.md`  | Day-2 operations, monitoring, troubleshooting               |
+| 7     | `07-documentation-index.md` | Index of all project artifacts with links                   |
+
+## Cost Estimation (07-ab-cost-estimate.md)
+
+> [!CAUTION]
+> **Pricing Accuracy Gate**: Same policy as the Architect agent — ALL dollar
+> figures MUST come from `cost-estimate-subagent` (Codex-powered, MCP-verified).
+> Never write a price from parametric knowledge.
+
+Delegate pricing to `cost-estimate-subagent`:
+
+1. **Query deployed resources** — use `az resource list` / Resource Graph to get actual SKUs, tiers, and quantities
+2. **Prepare resource list** — compile actual (not planned) resource types, SKUs, region, and quantities
+3. **Delegate to `cost-estimate-subagent`** — provide the deployed resource list and region
+4. **Integrate verbatim** — copy subagent prices into `07-ab-cost-estimate.md`. Do NOT round, adjust, or "correct" figures
+5. **Cross-check with 03-des-cost-estimate.md** — note any delta between planned and as-built costs
 
 ### Phase 3: As-Built Diagram
 
@@ -232,7 +243,8 @@ az graph query -q "resources | where resourceGroup == '{rg-name}' | project name
 - [ ] Deployed resource state queried (not just planned state)
 - [ ] All 7 documentation files generated with correct H2 headings
 - [ ] As-built diagram reflects actual deployed resources
-- [ ] Cost estimate uses real Pricing MCP data for deployed SKUs
+- [ ] Cost estimate uses `cost-estimate-subagent` prices — no hardcoded dollar figures
+- [ ] Planned vs as-built cost delta documented
 - [ ] Compliance matrix maps controls to actual resource configurations
 - [ ] Operations runbook includes real endpoints and resource names
 - [ ] README.md updated with Step 7 completion status

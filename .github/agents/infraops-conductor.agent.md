@@ -269,13 +269,22 @@ Use `#runSubagent` for each workflow step:
 
 Subagents are wired into their parent agents automatically:
 
-| Subagent                        | Parent Agent | When Used                      |
-| ------------------------------- | ------------ | ------------------------------ |
-| `cost-estimate-subagent`        | Architect    | Step 2 — pricing isolation     |
-| `governance-discovery-subagent` | Bicep Plan   | Step 4 — policy discovery gate |
-| `bicep-lint-subagent`           | Bicep Code   | Step 5 Phase 4 — syntax check  |
-| `bicep-review-subagent`         | Bicep Code   | Step 5 Phase 4 — code review   |
-| `bicep-whatif-subagent`         | Deploy       | Step 6 — deployment preview    |
+| Subagent                        | Parent Agent | When Used                                        |
+| ------------------------------- | ------------ | ------------------------------------------------ |
+| `cost-estimate-subagent`        | Architect    | Step 2 — pricing isolation + accuracy validation |
+| `cost-estimate-subagent`        | As-Built     | Step 7 — as-built pricing for deployed SKUs      |
+| `governance-discovery-subagent` | Bicep Plan   | Step 4 — policy discovery gate                   |
+| `bicep-lint-subagent`           | Bicep Code   | Step 5 Phase 4 — syntax check                    |
+| `bicep-review-subagent`         | Bicep Code   | Step 5 Phase 4 — code review                     |
+| `bicep-whatif-subagent`         | Deploy       | Step 6 — deployment preview                      |
+
+> [!NOTE]
+> **Pricing Accuracy Gate (Steps 2 & 7)**: No agent writes dollar figures from
+> parametric knowledge. All prices must originate from `cost-estimate-subagent`
+> (Codex + Azure Pricing MCP). This policy applies to both the Architect
+> (Step 2, `03-des-cost-estimate.md`) and As-Built (Step 7, `07-ab-cost-estimate.md`)
+> agents. Established after model evaluation found pricing hallucinations
+> (see `agent-output/model-eval-scoring.md`).
 
 Optional manual validation (power users only):
 If user explicitly requests extra validation at Step 5, delegate to lint/review/whatif subagents directly.
