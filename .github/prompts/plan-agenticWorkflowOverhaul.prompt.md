@@ -20,7 +20,7 @@ that phase, and continue execution.
 |     3 | Instruction Splits               | complete    | —       |
 |     4 | Error Rate & Burst Reduction     | complete    | —       |
 |     5 | Agent Body Optimization          | complete    | —       |
-|     6 | M1 Measurement Gate              | not-started | —       |
+|     6 | M1 Measurement Gate              | complete    | —       |
 
 ### Milestone 2: Extended Optimization (Phases 7-9) — ~10-15 hrs
 
@@ -53,7 +53,8 @@ that phase, and continue execution.
 | 2025-07-03 | 1       | 0, 1             | Removed phantom toolsets ref; split azure-defaults (702->141) and azure-artifacts (614->102); 16 ref files; 9 skill descs optimized; validator + parser fixes. Commits: fcb4327, b0de949. |
 | 2026-03-03 | 2       | 2, 3, 4          | Glob narrows + dedup (d883b37); instruction splits 1660->389 lines (97e0dcb); validator remediation messages (85c4a8b).                                                                   |
 | 2026-03-03 | 3       | 5 (partial)      | Phase 5 research complete: detailed extraction plan for 06t (501->~300) and 05t (443->~295). Implementation not started. Full state in agent-output/\_meta/ctx-opt-session-state.md.      |
-| 2026-03-04 | 4       | 5                | Phase 5 implementation: 7 agents trimmed (6416->5574 total, 13%); 3 TF ref files created; DO/DON'T->tables; Boundaries added to all 14 agents. Commit: d0b142a.                           |
+| 2026-03-04 | 4       | 5                | Phase 5 implementation: 7 agents trimmed (6416->5574 total, 13%); 3 TF ref files created; DO/DON'T->tables; Boundaries added to all 14 agents. Commit: d0b142a.                         |
+| 2026-03-04 | 5       | 6                | M1 gate: baseline snapshot from main, diff report generated. Agents -15%, Skills -20%, Instructions -32%. 43 ref files (on-demand). PR created.                                          |
 
 ---
 
