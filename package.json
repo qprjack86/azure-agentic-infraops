@@ -36,7 +36,12 @@
     "fetch:deprecations": "node scripts/fetch-azure-deprecations.mjs",
     "snapshot:baseline": "bash scripts/snapshot-agent-context.sh",
     "diff:baseline": "bash scripts/diff-context-baseline.sh",
-    "validate:all": "npm run lint:md && npm run lint:links:docs && npm run lint:artifact-templates && npm run lint:h2-sync && npm run lint:version-sync && npm run lint:deprecated-refs && npm run lint:mcp-config && npm run lint:agent-frontmatter && npm run lint:skills-format && npm run lint:instruction-frontmatter && npm run lint:governance-refs && npm run validate:instruction-refs && npm run validate:session-state && npm run lint:json && npm run lint:python && npm run lint:terraform-fmt && npm run validate:terraform && echo '✅ All validations passed'"
+    "lint:skill-size": "node scripts/validate-skill-size.mjs",
+    "lint:agent-body-size": "node scripts/validate-agent-body-size.mjs",
+    "lint:glob-audit": "node scripts/validate-glob-audit.mjs",
+    "lint:skill-references": "node scripts/validate-skill-references.mjs",
+    "lint:orphaned-content": "node scripts/validate-orphaned-content.mjs",
+    "validate:all": "npm run lint:md && npm run lint:links:docs && npm run lint:artifact-templates && npm run lint:h2-sync && npm run lint:version-sync && npm run lint:deprecated-refs && npm run lint:mcp-config && npm run lint:agent-frontmatter && npm run lint:skills-format && npm run lint:instruction-frontmatter && npm run lint:governance-refs && npm run validate:instruction-refs && npm run validate:session-state && npm run lint:json && npm run lint:python && npm run lint:terraform-fmt && npm run validate:terraform && npm run lint:skill-size && npm run lint:agent-body-size && npm run lint:glob-audit && npm run lint:skill-references && npm run lint:orphaned-content && npm run lint:docs-freshness && echo '✅ All validations passed'"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.1",
