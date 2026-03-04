@@ -24,19 +24,19 @@ that phase, and continue execution.
 
 ### Milestone 2: Extended Optimization (Phases 7-9) — ~10-15 hrs
 
-| Phase | Task | Detail File                        | Status      | Blocker |
-| ----: | ---- | ---------------------------------- | ----------- | ------- |
-|   7   | M2-A | `m2-a-ci-enforcement.md`           | not-started | —       |
-|   8   | M2-B | `m2-b-skill-splits.md`             | not-started | —       |
-|   9   | M2-C | `m2-c-subagent-overhaul.md`        | not-started | —       |
+| Phase | Task | Detail File                 | Status      | Blocker |
+| ----: | ---- | --------------------------- | ----------- | ------- |
+|     7 | M2-A | `m2-a-ci-enforcement.md`    | not-started | —       |
+|     8 | M2-B | `m2-b-skill-splits.md`      | not-started | —       |
+|     9 | M2-C | `m2-c-subagent-overhaul.md` | not-started | —       |
 
 ### Milestone 3: New Capabilities (Phases 10-12) — ~10-15 hrs
 
-| Phase | Task | Detail File                        | Status      | Blocker |
-| ----: | ---- | ---------------------------------- | ----------- | ------- |
-|  10   | M3-A | `m3-a-challenger-fastpath.md`      | not-started | —       |
-|  11   | M3-B | `m3-b-doc-gardening.md`            | not-started | —       |
-|  12   | M3-C | `m3-c-final-measurement.md`        | not-started | —       |
+| Phase | Task | Detail File                   | Status      | Blocker |
+| ----: | ---- | ----------------------------- | ----------- | ------- |
+|    10 | M3-A | `m3-a-challenger-fastpath.md` | not-started | —       |
+|    11 | M3-B | `m3-b-doc-gardening.md`       | not-started | —       |
+|    12 | M3-C | `m3-c-final-measurement.md`   | not-started | —       |
 
 ### KPI Targets
 
@@ -88,9 +88,9 @@ Do NOT load other milestone files — they are out of scope.
 | M2-A (7)     | `.github/prompts/plan-ctxopt/m2-a-ci-enforcement.md`      | 3                               |
 | M2-B (8)     | `.github/prompts/plan-ctxopt/m2-b-skill-splits.md`        | 3                               |
 | M2-C (9)     | `.github/prompts/plan-ctxopt/m2-c-subagent-overhaul.md`   | 3                               |
-| M3-A (10)    | `.github/prompts/plan-ctxopt/m3-a-challenger-fastpath.md`  | 3                               |
-| M3-B (11)    | `.github/prompts/plan-ctxopt/m3-b-doc-gardening.md`        | 3                               |
-| M3-C (12)    | `.github/prompts/plan-ctxopt/m3-c-final-measurement.md`    | 3                               |
+| M3-A (10)    | `.github/prompts/plan-ctxopt/m3-a-challenger-fastpath.md` | 3                               |
+| M3-B (11)    | `.github/prompts/plan-ctxopt/m3-b-doc-gardening.md`       | 3                               |
+| M3-C (12)    | `.github/prompts/plan-ctxopt/m3-c-final-measurement.md`   | 3                               |
 | Decisions    | `.github/prompts/plan-ctxopt/appendix-decisions.md`       | 0                               |
 | Findings     | `.github/prompts/plan-ctxopt/appendix-findings.md`        | 0                               |
 
@@ -148,16 +148,16 @@ Run 2x adversarial reviews (Sonnet 4.6 + GPT 5.3 lenses) at these points:
 
 ## Quick Reference
 
-| Concept       | Value                                                       |
-| ------------- | ----------------------------------------------------------- |
-| Total phases  | 13 (0-12) across 3 milestones                               |
-| Total effort  | ~35-50 hrs                                                  |
-| Validation    | `npm run validate:all` after every phase                    |
-| Canary tests  | After Phases 1, 5, 9                                        |
+| Concept       | Value                                                                   |
+| ------------- | ----------------------------------------------------------------------- |
+| Total phases  | 13 (0-12) across 3 milestones                                           |
+| Total effort  | ~35-50 hrs                                                              |
+| Validation    | `npm run validate:all` after every phase                                |
+| Canary tests  | After Phases 1, 5, 9                                                    |
 | Detail files  | `.github/prompts/plan-ctxopt/m1-*.md`, `m2-a/b/c-*.md`, `m3-a/b/c-*.md` |
-| Appendices    | `appendix-findings.md`, `appendix-decisions.md`             |
-| Source report | `agent-output/_meta/11-context-optimization-report.md`      |
-| Original plan | `agent-output/_meta/11-implementation-plan.md`              |
+| Appendices    | `appendix-findings.md`, `appendix-decisions.md`                         |
+| Source report | `agent-output/_meta/11-context-optimization-report.md`                  |
+| Original plan | `agent-output/_meta/11-implementation-plan.md`                          |
 
 ---
 

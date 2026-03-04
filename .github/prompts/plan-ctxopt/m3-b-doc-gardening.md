@@ -12,12 +12,12 @@ gains are maintained over time.
 
 ## Tasks
 
-| # | Action |
-|---|--------|
-| 1 | Add `lint:docs-freshness` to weekly GitHub Actions cron → opens issue when staleness detected |
-| 2 | Create quarterly context audit cadence: checklist/script that re-runs the context optimizer skill every 3 months |
-| 3 | Extend `check-docs-freshness.mjs` to cover skills and `references/` files |
-| 4 | Fix any remaining phantom references found by `validate-orphaned-content.mjs` |
+| #   | Action                                                                                                           |
+| --- | ---------------------------------------------------------------------------------------------------------------- |
+| 1   | Add `lint:docs-freshness` to weekly GitHub Actions cron → opens issue when staleness detected                    |
+| 2   | Create quarterly context audit cadence: checklist/script that re-runs the context optimizer skill every 3 months |
+| 3   | Extend `check-docs-freshness.mjs` to cover skills and `references/` files                                        |
+| 4   | Fix any remaining phantom references found by `validate-orphaned-content.mjs`                                    |
 
 ## Acceptance Criteria
 

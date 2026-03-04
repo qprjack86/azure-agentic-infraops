@@ -12,13 +12,13 @@ in M1, preventing context bloat regression.
 
 ## Validators to Create
 
-| # | Validator | Rule | Remediation |
-|---|-----------|------|-------------|
-| 1 | `validate-skill-size.mjs` | SKILL.md >200 lines needs `references/` | "Move content to `references/`" |
-| 2 | `validate-agent-body-size.mjs` | Agent body >350 lines | "Extract to skill refs or scripts" |
-| 3 | `validate-glob-audit.mjs` | Warn `applyTo: "**"` if >50 lines | "Narrow glob to extensions" |
-| 4 | `validate-skill-references.mjs` | All `references/` paths resolve; no orphans | "Add directive or remove file" |
-| 5 | `validate-orphaned-content.mjs` | Detect unreferenced skills/instructions | "Add reference or delete" |
+| #   | Validator                       | Rule                                        | Remediation                        |
+| --- | ------------------------------- | ------------------------------------------- | ---------------------------------- |
+| 1   | `validate-skill-size.mjs`       | SKILL.md >200 lines needs `references/`     | "Move content to `references/`"    |
+| 2   | `validate-agent-body-size.mjs`  | Agent body >350 lines                       | "Extract to skill refs or scripts" |
+| 3   | `validate-glob-audit.mjs`       | Warn `applyTo: "**"` if >50 lines           | "Narrow glob to extensions"        |
+| 4   | `validate-skill-references.mjs` | All `references/` paths resolve; no orphans | "Add directive or remove file"     |
+| 5   | `validate-orphaned-content.mjs` | Detect unreferenced skills/instructions     | "Add reference or delete"          |
 
 ## Additional Tasks
 
