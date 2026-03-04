@@ -26,9 +26,7 @@ console.log("\n🔍 Agent Body Size Validator\n");
 function checkAgentDir(dir) {
   if (!fs.existsSync(dir)) return;
 
-  const files = fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith(".agent.md"));
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".agent.md"));
 
   for (const file of files) {
     const filePath = path.join(dir, file);
@@ -66,9 +64,7 @@ checkAgentDir(AGENTS_DIR);
 checkAgentDir(SUBAGENTS_DIR);
 
 console.log(`\n${"─".repeat(50)}`);
-console.log(
-  `Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`,
-);
+console.log(`Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`);
 
 if (errors > 0) {
   console.log(`\n❌ ${errors} agent body size violation(s)`);

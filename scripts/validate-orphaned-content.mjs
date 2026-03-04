@@ -35,7 +35,9 @@ function gatherReferenceContent() {
   }
 
   if (fs.existsSync(INSTRUCTIONS_DIR)) {
-    for (const f of fs.readdirSync(INSTRUCTIONS_DIR).filter((f) => f.endsWith(".md"))) {
+    for (const f of fs
+      .readdirSync(INSTRUCTIONS_DIR)
+      .filter((f) => f.endsWith(".md"))) {
       content.push(fs.readFileSync(path.join(INSTRUCTIONS_DIR, f), "utf-8"));
     }
   }
@@ -79,9 +81,7 @@ for (const skill of skillDirs) {
     allContent.includes(`${skill}` + "/");
 
   if (!isReferenced) {
-    console.log(
-      `  ⚠️  ${skill}/ — not referenced by any agent or instruction`,
-    );
+    console.log(`  ⚠️  ${skill}/ — not referenced by any agent or instruction`);
     warnings++;
   }
 }
@@ -113,9 +113,7 @@ if (fs.existsSync(INSTRUCTIONS_DIR)) {
 }
 
 console.log(`\n${"─".repeat(50)}`);
-console.log(
-  `Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`,
-);
+console.log(`Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`);
 
 if (errors > 0) {
   console.log(`\n❌ ${errors} orphaned content error(s)`);

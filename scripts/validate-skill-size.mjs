@@ -63,9 +63,7 @@ for (const skill of skillDirs) {
 }
 
 console.log(`\n${"─".repeat(50)}`);
-console.log(
-  `Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`,
-);
+console.log(`Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`);
 
 if (errors > 0) {
   console.log(`\n❌ ${errors} skill size violation(s)`);

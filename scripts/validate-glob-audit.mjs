@@ -62,9 +62,7 @@ for (const file of files) {
 }
 
 console.log(`\n${"─".repeat(50)}`);
-console.log(
-  `Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`,
-);
+console.log(`Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`);
 
 if (errors > 0) {
   console.log(`\n❌ ${errors} glob audit violation(s)`);

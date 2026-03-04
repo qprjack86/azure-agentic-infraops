@@ -37,7 +37,9 @@ function gatherSearchableContent() {
 
   // Instruction files
   if (fs.existsSync(INSTRUCTIONS_DIR)) {
-    for (const f of fs.readdirSync(INSTRUCTIONS_DIR).filter((f) => f.endsWith(".md"))) {
+    for (const f of fs
+      .readdirSync(INSTRUCTIONS_DIR)
+      .filter((f) => f.endsWith(".md"))) {
       content.push(fs.readFileSync(path.join(INSTRUCTIONS_DIR, f), "utf-8"));
     }
   }
@@ -66,9 +68,7 @@ for (const skill of skillDirs) {
   const refsDir = path.join(SKILLS_DIR, skill, "references");
   if (!fs.existsSync(refsDir)) continue;
 
-  const refFiles = fs
-    .readdirSync(refsDir)
-    .filter((f) => f.endsWith(".md"));
+  const refFiles = fs.readdirSync(refsDir).filter((f) => f.endsWith(".md"));
 
   for (const refFile of refFiles) {
     checked++;
@@ -120,9 +120,7 @@ if (fs.existsSync(instrRefsDir)) {
 }
 
 console.log(`\n${"─".repeat(50)}`);
-console.log(
-  `Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`,
-);
+console.log(`Checked: ${checked} | Warnings: ${warnings} | Errors: ${errors}`);
 
 if (errors > 0) {
   console.log(`\n❌ ${errors} reference resolution error(s)`);
