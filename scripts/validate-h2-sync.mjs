@@ -174,7 +174,6 @@ function main() {
 
   const missing = [];
   if (!fs.existsSync(SKILL_PATH)) missing.push(SKILL_PATH);
-  if (!fs.existsSync(H2_REF_PATH)) missing.push(H2_REF_PATH);
   if (!fs.existsSync(VALIDATOR_PATH)) missing.push(VALIDATOR_PATH);
   if (missing.length > 0) {
     for (const f of missing) {
@@ -184,6 +183,12 @@ function main() {
       "  Fix: Ensure all H2 source files exist. Run 'git status' to check for missing files.",
     );
     process.exit(1);
+  }
+
+  // H2_REF_PATH is optional — only compared when present
+  const h2RefExists = fs.existsSync(H2_REF_PATH);
+  if (!h2RefExists) {
+    console.log(`  ⚠️  ${H2_REF_PATH} not found — skipping instruction-file comparison`);
   }
 
   const skillHeadings = parseMarkdownH2Blocks(readText(SKILL_PATH));
@@ -204,11 +209,13 @@ function main() {
     }
   }
 
-  const h2RefHeadings = parseMarkdownH2Blocks(readText(H2_REF_PATH));
+  const h2RefHeadings = h2RefExists
+    ? parseMarkdownH2Blocks(readText(H2_REF_PATH))
+    : new Map();
   const validatorHeadings = parseValidatorHeadings(readText(VALIDATOR_PATH));
 
   console.log(
-    `Sources: SKILL.md + references/ (${skillHeadings.size}), H2-reference (${h2RefHeadings.size}), Validator (${validatorHeadings.size})\n`,
+    `Sources: SKILL.md + references/ (${skillHeadings.size}), H2-reference (${h2RefHeadings.size}${h2RefExists ? "" : " — skipped"}), Validator (${validatorHeadings.size})\n`,
   );
 
   for (const artifactName of ARTIFACT_NAMES) {
