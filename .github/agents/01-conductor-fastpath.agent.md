@@ -35,6 +35,7 @@ tools:
     web,
     web/fetch,
     "azure-mcp/*",
+    ".github/skills/msgraph/*",
     todo,
   ]
 handoffs:
@@ -64,6 +65,7 @@ Streamlined orchestrator for **simple** Azure infrastructure projects.
 2. **Read** `.github/skills/session-resume/SKILL.md`
 3. **Read** `.github/skills/azure-defaults/SKILL.md`
 4. **Read** `.github/skills/azure-artifacts/SKILL.md`
+5. **Read** `.github/skills/msgraph/SKILL.md`
 
 ## Fast-Path Workflow (5 Steps)
 
@@ -90,12 +92,14 @@ Delegate to `03-Architect` agent. For simple projects:
 This is the key optimization — Plan and Code are combined:
 
 1. Delegate to the IaC Planner (05b or 05t based on `iac_tool`)
-   - **Skip governance discovery** (simple projects have no custom policies)
-   - **Skip adversarial review** of the plan (1-pass at code stage)
-   - Single deployment phase (no phased deployment needed)
-2. Immediately delegate to the IaC CodeGen agent (06b or 06t)
-   - 1-pass comprehensive adversarial review (not 3-pass)
-   - Standard validation (lint + review subagents)
+   - **MANDATORY**: Follow `.github/instructions/msgraph.instructions.md` for any identity/RBAC needs.
+   - **Skip governance discovery** (simple projects have no custom policies).
+   - **Skip adversarial review** of the plan (1-pass at code stage).
+   - Single deployment phase (no phased deployment needed).
+2. Immediately delegate to the IaC CodeGen agent (06b or 06t).
+   - **GATE**: Ensure `msgraph` skill has resolved all Object IDs before writing code.
+   - 1-pass comprehensive adversarial review (not 3-pass).
+   - Standard validation (lint + review subagents).
 
 ### Step 4: Deploy (same as standard)
 
@@ -106,15 +110,16 @@ User approval is still required.
 
 Delegate to `08-As-Built` agent. For simple projects:
 
-- Generate only: design document, operations runbook, resource inventory
-- Skip: compliance matrix, backup/DR plan (not needed for simple)
+- Generate only: design document, operations runbook, resource inventory.
+- Skip: compliance matrix, backup/DR plan (not needed for simple).
 
 ## Boundaries
 
-- **Always**: Check complexity classification, require user approval at deploy
-- **Ask first**: Nothing — fast path is autonomous between gates
+- **Always**: Check complexity classification, require user approval at deploy.
+- **Always**: Use the `msgraph` skill for any Entra ID object lookups; never use placeholders.
+- **Ask first**: Nothing — fast path is autonomous between gates.
 - **Never**: Process standard/complex projects, skip deploy approval,
-  skip WAF assessment
+  skip WAF assessment.
 
 ## Promotion Path
 

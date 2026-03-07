@@ -51,3 +51,31 @@ fi
 
 ELAPSED=$(( $(date +%s) - START ))
 printf " ✅ Tool refresh complete (%ds)\n\n" "$ELAPSED"
+
+# ─── msgraph CLI status ───────────────────────────────────────────────────────
+
+export PATH="${HOME}/.local/bin:${PATH}"
+if command -v msgraph &>/dev/null; then
+    # Source D-Bus env so auth status can access the keyring
+    if [ -f "${HOME}/.dbus-env" ]; then
+        . "${HOME}/.dbus-env"
+    fi
+
+    MSGRAPH_TMP=$(mktemp)
+    if timeout 10 msgraph auth status > "${MSGRAPH_TMP}" 2>&1; then
+        SIGNED_IN=$(grep -o '"signedIn": true' "${MSGRAPH_TMP}" 2>/dev/null || true)
+        AUTH_METHOD=$(grep -o '"authMethod": "[^"]*"' "${MSGRAPH_TMP}" 2>/dev/null | cut -d'"' -f4 || true)
+        CLIENT_ID=$(grep -o '"clientId": "[^"]*"' "${MSGRAPH_TMP}" 2>/dev/null | cut -d'"' -f4 || true)
+        TENANT_ID=$(grep -o '"tenantId": "[^"]*"' "${MSGRAPH_TMP}" 2>/dev/null | cut -d'"' -f4 || true)
+
+        if [ -n "${SIGNED_IN}" ]; then
+            printf " 🔐 msgraph CLI: ✅ Signed in (method: %s, tenant: %s, app: %s)\n\n" \
+                "${AUTH_METHOD:-unknown}" "${TENANT_ID:-unknown}" "${CLIENT_ID:-unknown}"
+        else
+            printf " 🔐 msgraph CLI: ⏳ Will auto-signin when first terminal opens\n\n"
+        fi
+    else
+        printf " 🔐 msgraph CLI: ⏳ Will auto-signin when first terminal opens\n\n"
+    fi
+    rm -f "${MSGRAPH_TMP}"
+fi

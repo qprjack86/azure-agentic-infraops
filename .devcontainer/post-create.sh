@@ -3,7 +3,7 @@ set -e
 
 # ─── Progress Tracking Helpers ───────────────────────────────────────────────
 
-TOTAL_STEPS=10
+TOTAL_STEPS=13
 CURRENT_STEP=0
 SETUP_START=$(date +%s)
 STEP_START=0
@@ -79,6 +79,45 @@ chmod 755 "${HOME}/.config/gh" 2>/dev/null || true
 git config --global --add safe.directory "${PWD}"
 git config --global core.autocrlf input
 step_done "Git configured, cache dirs created"
+
+# ─── Step 3b: D-Bus + gnome-keyring (required by msgraph CLI) ────────────────
+
+step_start "🔑" "Initializing D-Bus session for keyring..."
+DBUS_ENV_FILE="${HOME}/.dbus-env"
+if command -v dbus-launch &>/dev/null; then
+    # Start D-Bus session daemon and persist the env vars
+    eval "$(dbus-launch --sh-syntax)"
+    echo "export DBUS_SESSION_BUS_ADDRESS='${DBUS_SESSION_BUS_ADDRESS}'" > "${DBUS_ENV_FILE}"
+    echo "export DBUS_SESSION_BUS_PID='${DBUS_SESSION_BUS_PID}'" >> "${DBUS_ENV_FILE}"
+
+    # Unlock gnome-keyring with empty password (dev container only)
+    # Start the daemon first to create the default collection, then unlock it
+    if command -v gnome-keyring-daemon &>/dev/null; then
+        # Start the daemon with secrets component — creates default keyring if needed
+        eval "$(echo "" | gnome-keyring-daemon --start --components=secrets 2>/dev/null)" || true
+        # Unlock it with empty password so no GUI prompt appears
+        echo "" | gnome-keyring-daemon --unlock --components=secrets 2>/dev/null || true
+    fi
+
+    # Add to .bashrc so every new terminal inherits the D-Bus session and keyring
+    BASHRC="${HOME}/.bashrc"
+    if ! grep -q 'dbus-env' "${BASHRC}" 2>/dev/null; then
+        cat >> "${BASHRC}" <<'BASHRC_SNIPPET'
+
+# D-Bus session + gnome-keyring for msgraph CLI
+if [ -f "$HOME/.dbus-env" ]; then
+    . "$HOME/.dbus-env"
+fi
+if command -v gnome-keyring-daemon &>/dev/null && [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+    eval "$(echo "" | gnome-keyring-daemon --start --components=secrets 2>/dev/null)" 2>/dev/null || true
+    echo "" | gnome-keyring-daemon --unlock --components=secrets 2>/dev/null || true
+fi
+BASHRC_SNIPPET
+    fi
+    step_done "D-Bus session started, keyring unlocked, env persisted to .bashrc"
+else
+    step_warn "dbus-launch not found — install dbus-x11 package"
+fi
 
 # ─── Step 4: Python packages ─────────────────────────────────────────────────
 
@@ -192,7 +231,48 @@ else
     step_warn "Azure CLI config skipped (not authenticated)"
 fi
 
-# ─── Step 10: MCP config & final verification ─────────────────────────────
+# ─── Step 10: Microsoft Graph Skill ──────────────────────────────────────────
+
+step_start "📊" "Installing Microsoft Graph Skill..."
+if [ -f ".github/skills/msgraph/SKILL.md" ]; then
+    step_done "Graph Skill already exists — skipping install"
+else
+    # Use --yes on both npx and the skills CLI to bypass all interactive prompts
+    if npx --yes skills add merill/msgraph --yes --loglevel=warn 2>&1 | tail -3; then
+        # Move the skill to the custom directory expected by devcontainer.json
+        mkdir -p .github/skills
+        mv .agents/skills/msgraph .github/skills/msgraph 2>/dev/null || true
+
+        # Clean up the default agents directory if it is now empty
+        rm -rf .agents 2>/dev/null || true
+
+        step_done "Graph Skill installed to .github/skills"
+    else
+        step_warn "Graph Skill installation had issues"
+    fi
+fi
+
+# ─── Step 10b: msgraph CLI on PATH ───────────────────────────────────────────
+
+step_start "🔗" "Adding msgraph CLI to PATH..."
+MSGRAPH_SKILL_DIR="${PWD}/.github/skills/msgraph"
+MSGRAPH_WRAPPER="${HOME}/.local/bin/msgraph"
+mkdir -p "${HOME}/.local/bin"
+if [ -f "${MSGRAPH_SKILL_DIR}/scripts/run.sh" ]; then
+    # Create a wrapper script that invokes the launcher
+    printf '#!/usr/bin/env bash\nexec bash "%s/scripts/run.sh" "$@"\n' "${MSGRAPH_SKILL_DIR}" > "${MSGRAPH_WRAPPER}"
+    chmod +x "${MSGRAPH_WRAPPER}"
+    # Ensure ~/.local/bin is on PATH in .bashrc
+    if ! grep -q 'HOME/.local/bin' "${HOME}/.bashrc" 2>/dev/null; then
+        printf '\n# msgraph CLI\nexport PATH="${HOME}/.local/bin:${PATH}"\n' >> "${HOME}/.bashrc"
+    fi
+    export PATH="${HOME}/.local/bin:${PATH}"
+    step_done "msgraph available at ${MSGRAPH_WRAPPER}"
+else
+    step_warn "msgraph skill scripts not found — CLI not added to PATH"
+fi
+
+# ─── Step 11: MCP config & final verification ─────────────────────────────
 
 step_start "🔍" "Verifying installations & MCP config..."
 

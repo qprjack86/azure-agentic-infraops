@@ -28,7 +28,7 @@
   },
 
   // Lifecycle commands - chain apt operations to avoid lock conflicts
-  "onCreateCommand": "set -e; sudo rm -f /etc/apt/sources.list.d/yarn.list 2>/dev/null; sudo apt-get update; sudo apt-get install -y graphviz dos2unix; ARCH=$(dpkg --print-architecture); if [ \"$ARCH\" = \"amd64\" ]; then curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg; echo 'deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main' | sudo tee /etc/apt/sources.list.d/k6.list; sudo apt-get update; sudo apt-get install -y k6; else echo \"Skipping k6 install on unsupported architecture: $ARCH\"; fi; curl -LsSf https://astral.sh/uv/install.sh | sh",
+  "onCreateCommand": "set -e; sudo rm -f /etc/apt/sources.list.d/yarn.list 2>/dev/null; sudo apt-get update; sudo apt-get install -y graphviz dos2unix dbus-x11 gnome-keyring libsecret-1-0; ARCH=$(dpkg --print-architecture); if [ \"$ARCH\" = \"amd64\" ]; then curl -fsSL https://dl.k6.io/key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/k6-archive-keyring.gpg; echo 'deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main' | sudo tee /etc/apt/sources.list.d/k6.list; sudo apt-get update; sudo apt-get install -y k6; else echo \"Skipping k6 install on unsupported architecture: $ARCH\"; fi; curl -LsSf https://astral.sh/uv/install.sh | sh",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "postStartCommand": {
     "lefthook": "npx lefthook install 2>/dev/null || true",
@@ -50,7 +50,13 @@
     //   "terminal.integrated.env.linux": { "GH_TOKEN": "ghp_yourTokenHere" }
     // This is the ONLY supported method — shell exports (.bashrc/.profile) do NOT propagate reliably.
     // Value is empty string if not set — gh CLI falls back to its normal auth flow.
-    "GH_TOKEN": "${localEnv:GH_TOKEN}"
+    "GH_TOKEN": "${localEnv:GH_TOKEN}",
+    // Pass msgraph app registration credentials from host → container.
+    // Each user sets these in VS Code User Settings under "terminal.integrated.env.linux".
+    // The post-start script auto-detects them and signs in silently (no browser needed).
+    "MSGRAPH_CLIENT_ID": "${localEnv:MSGRAPH_CLIENT_ID}",
+    "MSGRAPH_TENANT_ID": "${localEnv:MSGRAPH_TENANT_ID}",
+    "MSGRAPH_CLIENT_SECRET": "${localEnv:MSGRAPH_CLIENT_SECRET}"
   },
 
   "customizations": {

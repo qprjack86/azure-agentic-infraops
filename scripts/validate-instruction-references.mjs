@@ -14,7 +14,7 @@
  * node scripts/validate-instruction-references.mjs
  */
 
-import fs, { globSync } from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
 
 const ROOT = process.cwd();
@@ -42,23 +42,120 @@ function fileExists(relPath) {
 
 function collectFiles(dirs, extensions) {
   const files = [];
-  for (const dir of dirs) {
-    const absDir = path.resolve(ROOT, dir);
-    if (!fs.existsSync(absDir)) continue;
-    for (const entry of fs.readdirSync(absDir, {
-      withFileTypes: true,
-      recursive: true,
-    })) {
-      const full = path.join(entry.parentPath || entry.path, entry.name);
+  const excludedDirs = new Set([".git", ".venv", "node_modules", "dist", "build"]);
+
+  function walk(dirPath) {
+    for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+      const fullPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        if (!excludedDirs.has(entry.name)) {
+          walk(fullPath);
+        }
+        continue;
+      }
+
       if (
         entry.isFile() &&
         extensions.some((ext) => entry.name.endsWith(ext))
       ) {
-        files.push(full);
+        files.push(fullPath);
       }
     }
   }
+
+  for (const dir of dirs) {
+    const absDir = path.resolve(ROOT, dir);
+    if (!fs.existsSync(absDir)) continue;
+    walk(absDir);
+  }
   return files;
+}
+
+function escapeRegex(text) {
+  return text.replace(/[|\\{}()[\]^$+?.]/g, "\\$&");
+}
+
+function globToRegex(pattern) {
+  let regex = "";
+  let i = 0;
+
+  while (i < pattern.length) {
+    const ch = pattern[i];
+    const next = pattern[i + 1];
+
+    if (ch === "*") {
+      if (next === "*") {
+        const afterNext = pattern[i + 2];
+        // `**/` can match zero or more directories.
+        if (afterNext === "/") {
+          regex += "(?:.*/)?";
+          i += 3;
+        } else {
+          regex += ".*";
+          i += 2;
+        }
+      } else {
+        regex += "[^/]*";
+        i += 1;
+      }
+      continue;
+    }
+
+    if (ch === "?") {
+      regex += "[^/]";
+      i += 1;
+      continue;
+    }
+
+    if (ch === "{") {
+      const close = pattern.indexOf("}", i + 1);
+      if (close !== -1) {
+        const choices = pattern
+          .slice(i + 1, close)
+          .split(",")
+          .map((choice) => escapeRegex(choice.trim()))
+          .filter(Boolean);
+        if (choices.length > 0) {
+          regex += `(?:${choices.join("|")})`;
+          i = close + 1;
+          continue;
+        }
+      }
+    }
+
+    regex += escapeRegex(ch);
+    i += 1;
+  }
+
+  return new RegExp(`^${regex}$`);
+}
+
+let repoFilesCache = null;
+
+function listRepoFiles() {
+  if (repoFilesCache) return repoFilesCache;
+
+  const excludedDirs = new Set([".git", ".venv", "node_modules", "dist", "build"]);
+  const files = [];
+
+  function walk(dirPath) {
+    for (const entry of fs.readdirSync(dirPath, { withFileTypes: true })) {
+      const fullPath = path.join(dirPath, entry.name);
+      if (entry.isDirectory()) {
+        if (!excludedDirs.has(entry.name)) {
+          walk(fullPath);
+        }
+        continue;
+      }
+      if (entry.isFile()) {
+        files.push(path.relative(ROOT, fullPath).replaceAll(path.sep, "/"));
+      }
+    }
+  }
+
+  walk(ROOT);
+  repoFilesCache = files;
+  return repoFilesCache;
 }
 
 /**
@@ -122,13 +219,9 @@ function globHasMatch(pattern) {
     }
   }
   try {
-    // Exclude generated/dependency directories for speed and accuracy
-    const matches = globSync(expanded, {
-      cwd: ROOT,
-      exclude: (p) =>
-        p === ".venv" || p === "node_modules" || p === "dist" || p === "build",
-    });
-    return matches.length > 0;
+    const files = listRepoFiles();
+    const regexes = expanded.map(globToRegex);
+    return files.some((file) => regexes.some((rx) => rx.test(file)));
   } catch {
     return false;
   }
