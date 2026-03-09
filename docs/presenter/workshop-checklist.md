@@ -1,23 +1,17 @@
-# Workshop Delivery Checklist
+<a id="top"></a>
+
+# MicroHack Delivery Checklist
 
 > **[Version](../../VERSION.md)** | [Back to Presenter Resources](README.md)
 >
-> A comprehensive checklist for trainers delivering Agentic InfraOps workshops.
+> A comprehensive checklist for trainers delivering Agentic InfraOps MicroHack sessions.
 > Use this before, during, and after your sessions to ensure smooth delivery.
+>
+> 🎯 **MicroHack site**: <https://jonathan-vella.github.io/microhack-agentic-infraops/>
+> — A hands-on, guided challenge where participants build Azure infrastructure
+> end-to-end using AI agents, from requirements to deployment.
 
----
-
-## 📋 Table of Contents
-
-- [Pre-Workshop (1-2 Days Before)](#-pre-workshop-1-2-days-before)
-- [Day-Of Setup (2 Hours Before)](#-day-of-setup-2-hours-before)
-- [During Workshop](#-during-workshop)
-- [Post-Workshop](#-post-workshop)
-- [Emergency Procedures](#-emergency-procedures)
-
----
-
-## 🗓️ Pre-Workshop (1-2 Days Before)
+## 📅️ Pre-Session (1-2 Days Before)
 
 ### Environment Preparation
 
@@ -75,7 +69,9 @@
   - [ ] Screenshots of expected outputs
   - [ ] Alternative scenarios if primary fails
 
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="section divider" width="100%">
+<div align="right"><a href="#top"><b>⬆️ Back to Top</b></a></div>
+
 
 ## ⏰ Day-Of Setup (2 Hours Before)
 
@@ -129,9 +125,11 @@
 - [ ] **Have water/coffee ready**
 - [ ] **Quick stretch/breathing exercise**
 
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="section divider" width="100%">
+<div align="right"><a href="#top"><b>⬆️ Back to Top</b></a></div>
 
-## 🎯 During Workshop
+
+## 🎯 During Session
 
 ### Opening (First 10 Minutes)
 
@@ -187,9 +185,11 @@
 | 90%        | Start wrap-up               |
 | 100%       | Q&A and next steps          |
 
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="section divider" width="100%">
+<div align="right"><a href="#top"><b>⬆️ Back to Top</b></a></div>
 
-## 📊 Post-Workshop
+
+## 📊 Post-Session
 
 ### Immediate (Within 30 Minutes)
 
@@ -237,7 +237,9 @@
   - [ ] Common questions
   - [ ] Improvement suggestions
 
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="section divider" width="100%">
+<div align="right"><a href="#top"><b>⬆️ Back to Top</b></a></div>
+
 
 ## 🚨 Emergency Procedures
 
@@ -278,7 +280,9 @@
 3. Provide completed code samples
 4. Offer 1:1 help after session
 
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="section divider" width="100%">
+<div align="right"><a href="#top"><b>⬆️ Back to Top</b></a></div>
+
 
 ## 📝 Quick Reference
 
@@ -307,9 +311,11 @@
 - **Content Questions**: Repository maintainers
 - **Azure Issues**: <https://azure.microsoft.com/support>
 
----
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="section divider" width="100%">
 
 **📖 See Also:**
 
 - [Character Reference](character-reference.md) - Scenario personas
 - [Troubleshooting Guide](../troubleshooting.md) - Common issues and solutions
+
+<div align="right"><a href="#top"><b>⬆️ Back to Top</b></a></div>

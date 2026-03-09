@@ -1,8 +1,18 @@
-# Agent and Skill Workflow
+---
+toc_depth: 2
+---
 
-> [Current Version](../VERSION.md) | The 7-step infrastructure development workflow
+<div align="center">
+  <img src="assets/images/hero-workflow.jpg"
+    width="100%" height="250" style="object-fit: cover; border-radius: 10px;"
+    alt="Collaborative technology workspace"/>
+</div>
 
-## Overview
+# :material-chart-timeline-variant: Agent and Skill Workflow
+
+The 7-step infrastructure development workflow.
+
+## :material-eye-outline: Overview
 
 Agentic InfraOps uses a multi-agent orchestration system where specialized AI agents coordinate
 through artifact handoffs to transform Azure infrastructure requirements into deployed infrastructure
@@ -14,7 +24,25 @@ The **InfraOps Conductor** (🎼 Maestro) orchestrates the complete workflow, ro
 Bicep or Terraform agents based on the `iac_tool` field in `01-requirements.md`,
 while enforcing mandatory approval gates.
 
-## Agent Architecture
+!!! tip "Quick Start"
+
+    Press ++ctrl+shift+i++ to open Copilot Chat, select **InfraOps Conductor**, and
+    describe your project. The Conductor handles all 7 steps with approval gates.
+
+### Formalized Workflow Engine
+
+The workflow is defined as a machine-readable DAG (Directed Acyclic Graph) in
+`.github/skills/workflow-engine/templates/workflow-graph.json`. The Conductor reads this
+graph instead of relying on hardcoded step logic:
+
+- **Nodes**: agent-step, gate, subagent-fan-out, validation
+- **Edges**: dependency links with conditions (`on_complete`, `on_skip`, `on_fail`)
+- **IaC routing**: conditional edges route to Bicep or Terraform agents based on `decisions.iac_tool`
+- **Fan-out**: Step 7 substeps (cost estimate, runbook, etc.) can execute in parallel
+
+The Conductor resolves agent paths and models via `.github/agent-registry.json`.
+
+## :material-robot-outline: Agent Architecture
 
 ### The Conductor Pattern
 
@@ -99,9 +127,7 @@ graph TB
     style DOCS fill:#e3f2fd
 ```
 
----
-
-## Agent Roster
+## :material-account-group-outline: Agent Roster
 
 ### Primary Orchestrator
 
@@ -151,11 +177,14 @@ Steps 1-3 and 7 are shared. Steps 4-6 have Bicep and Terraform variants.
 | `challenger` | ⚔️ Challenger | Adversarial reviewer — challenges requirements, architecture, and plans |
 | `diagnose`   | 🔍 Sentinel   | Resource health assessment and troubleshooting                          |
 
----
-
-## Approval Gates
+## :material-shield-lock-outline: Approval Gates
 
 The Conductor enforces mandatory pause points for human oversight:
+
+!!! warning "Never Skip Gates"
+
+    Gates are non-negotiable. Skipping approval gates can lead to deploying
+    infrastructure that violates governance policies or security baselines.
 
 | Gate       | After Step            | User Action                         |
 | ---------- | --------------------- | ----------------------------------- |
@@ -165,9 +194,7 @@ The Conductor enforces mandatory pause points for human oversight:
 | **Gate 4** | Pre-Deploy (Step 5)   | Approve lint/what-if/review results |
 | **Gate 5** | Post-Deploy (Step 6)  | Verify deployment                   |
 
----
-
-## Workflow Steps
+## :material-list-status: Workflow Steps
 
 ### Step 1: Requirements (📜 Scribe)
 
@@ -189,8 +216,6 @@ Output: agent-output/{project}/01-requirements.md
 
 **Handoff**: Passes context to `architect` agent.
 
----
-
 ### Step 2: Architecture (🏛️ Oracle)
 
 **Agent**: `architect`
@@ -211,8 +236,6 @@ Output: agent-output/{project}/02-architecture-assessment.md
 
 **Handoff**: Suggests `azure-diagrams` skill or IaC planning agent (`bicep-plan` / `terraform-plan`).
 
----
-
 ### Step 3: Design Artifacts (🎨 Artisan | Optional)
 
 **Skills**: `azure-diagrams`, `azure-adr`
@@ -228,19 +251,25 @@ Output: agent-output/{project}/03-des-diagram.py, 03-des-adr-*.md
 
 **ADR content**: Decision, context, alternatives, consequences
 
----
-
 ### Step 4: Planning (📐 Strategist)
 
 **Agent**: `bicep-plan` (Bicep track) or `terraform-plan` (Terraform track)
 
 Create detailed implementation plan with governance discovery.
 
-```text
-Bicep:     Ctrl+Shift+A → bicep-plan
-Terraform: Ctrl+Shift+A → terraform-plan
-Output:    agent-output/{project}/04-implementation-plan.md, 04-governance-constraints.md
-```
+=== "Bicep"
+
+    ```text
+    Invoke: Ctrl+Shift+A → bicep-plan
+    Output: agent-output/{project}/04-implementation-plan.md, 04-governance-constraints.md
+    ```
+
+=== "Terraform"
+
+    ```text
+    Invoke: Ctrl+Shift+A → terraform-plan
+    Output: agent-output/{project}/04-implementation-plan.md, 04-governance-constraints.md
+    ```
 
 **Features**:
 
@@ -252,9 +281,9 @@ Output:    agent-output/{project}/04-implementation-plan.md, 04-governance-const
 - Naming convention validation (CAF)
 - Phased implementation approach
 
-**Gate**: User approves the implementation plan before proceeding.
+!!! info "Approval Gate"
 
----
+    The user must approve the implementation plan before proceeding to code generation.
 
 ### Step 5: Implementation (⚒️ Forge)
 
@@ -262,15 +291,21 @@ Output:    agent-output/{project}/04-implementation-plan.md, 04-governance-const
 
 Generate IaC templates following Azure Verified Modules standards.
 
-```text
-Bicep:     Ctrl+Shift+A → bicep-code
-           Output: infra/bicep/{project}/main.bicep, modules/
+=== "Bicep"
 
-Terraform: Ctrl+Shift+A → terraform-code
-           Output: infra/terraform/{project}/main.tf, modules/
+    ```text
+    Invoke: Ctrl+Shift+A → bicep-code
+    Output: infra/bicep/{project}/main.bicep, modules/
+    ```
 
-Both:      agent-output/{project}/05-implementation-reference.md
-```
+=== "Terraform"
+
+    ```text
+    Invoke: Ctrl+Shift+A → terraform-code
+    Output: infra/terraform/{project}/main.tf, modules/
+    ```
+
+Both tracks also produce `agent-output/{project}/05-implementation-reference.md`.
 
 **Standards** (shared across both tracks):
 
@@ -288,9 +323,9 @@ Both:      agent-output/{project}/05-implementation-reference.md
 | `bicep-whatif-subagent` | `terraform-plan-subagent`   | Deployment preview            |
 | `bicep-review-subagent` | `terraform-review-subagent` | AVM compliance, security scan |
 
-**Gate**: User approves preflight validation results.
+!!! info "Approval Gate"
 
----
+    The user must approve preflight validation results before deployment.
 
 ### Step 6: Deployment (🚀 Envoy)
 
@@ -298,29 +333,30 @@ Both:      agent-output/{project}/05-implementation-reference.md
 
 Execute Azure deployment with preflight validation.
 
-```text
-Bicep:     Ctrl+Shift+A → bicep-deploy
-Terraform: Ctrl+Shift+A → terraform-deploy
-Output:    agent-output/{project}/06-deployment-summary.md
-```
+=== "Bicep"
 
-**Bicep features**:
+    ```text
+    Invoke: Ctrl+Shift+A → bicep-deploy
+    Output: agent-output/{project}/06-deployment-summary.md
+    ```
 
-- `bicep build` validation
-- `az deployment group what-if` analysis
-- Deployment execution via `deploy.ps1`
-- Post-deployment resource verification
+    **Bicep features**: `bicep build` validation, `az deployment group what-if` analysis,
+    deployment execution via `deploy.ps1`, post-deployment resource verification.
 
-**Terraform features**:
+=== "Terraform"
 
-- `terraform validate` and `terraform fmt -check`
-- `terraform plan` preview
-- Phase-aware deployment via `bootstrap.sh` and `deploy.sh`
-- Post-deployment resource verification
+    ```text
+    Invoke: Ctrl+Shift+A → terraform-deploy
+    Output: agent-output/{project}/06-deployment-summary.md
+    ```
 
-**Gate**: User verifies deployed resources.
+    **Terraform features**: `terraform validate` and `terraform fmt -check`,
+    `terraform plan` preview, phase-aware deployment via `bootstrap.sh` and `deploy.sh`,
+    post-deployment resource verification.
 
----
+!!! info "Approval Gate"
+
+    The user must verify deployed resources before proceeding to documentation.
 
 ### Step 7: Documentation (📚 Skills)
 
@@ -345,8 +381,6 @@ Output: agent-output/{project}/07-*.md
 | `07-compliance-matrix.md`   | Security control mapping       |
 | `07-backup-dr-plan.md`      | Disaster recovery procedures   |
 
----
-
 ## Agents vs Skills
 
 | Aspect          | Agents                                   | Skills                   |
@@ -356,8 +390,6 @@ Output: agent-output/{project}/07-*.md
 | **State**       | Session context                          | Stateless                |
 | **Output**      | Multiple artifacts                       | Specific outputs         |
 | **When to use** | Core workflow steps                      | Specialized capabilities |
-
----
 
 ## Quick Reference
 
@@ -392,8 +424,6 @@ Output: agent-output/{project}/07-*.md
 "Use the azure-artifacts skill to generate documentation"
 ```
 
----
-
 ## Artifact Naming Convention
 
 | Step           | Prefix    | Example                                                     |
@@ -407,9 +437,7 @@ Output: agent-output/{project}/07-*.md
 | As-Built       | `07-`     | `07-design-document.md`, `07-ab-diagram.py`                 |
 | Diagnostics    | `08-`     | `08-resource-health-report.md`                              |
 
----
-
 ## Next Steps
 
-- [Prompt Guide](prompt-guide/) — ready-to-use prompts for every agent and skill
+- [Prompt Guide](prompt-guide/index.md) — ready-to-use prompts for every agent and skill
 - [Quickstart](quickstart.md) — 10-minute getting started walkthrough
